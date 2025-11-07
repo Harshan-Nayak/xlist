@@ -10,7 +10,7 @@ import { ThemeToggle } from "@/components/ThemeToggle";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { getProfiles, getUserProfiles } from "@/lib/firestore";
 import { Profile } from "@/types";
-import { Search } from "lucide-react";
+import { Search, Info } from "lucide-react";
 
 function HomeContent() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -97,6 +97,19 @@ function HomeContent() {
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">XList</h1>
             <div className="flex items-center space-x-2 sm:space-x-4">
               <ThemeToggle />
+              <div className="relative group">
+                <a
+                  href="https://x.com/shipmodeon"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Info className="w-4 h-4" />
+                </a>
+                <div className="absolute right-0 top-full mt-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md border opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  any queries?
+                </div>
+              </div>
               {user ? (
                 <>
                   <Button

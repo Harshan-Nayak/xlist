@@ -12,6 +12,22 @@ export interface Profile {
   createdAt: Date;
 }
 
+export interface ProfileClick {
+  id: string;
+  profileId: string;
+  clickedAt: Date;
+  userAgent?: string;
+  ipAddress?: string;
+}
+
+export interface AnalyticsData {
+  totalClicks: number;
+  dailyClicks: { date: string; clicks: number }[];
+  monthlyClicks: number;
+  weeklyClicks: number;
+  todayClicks: number;
+}
+
 export interface User {
   uid: string;
   email: string;

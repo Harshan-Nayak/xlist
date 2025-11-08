@@ -7,10 +7,11 @@ import { ProfileCard } from "@/components/ProfileCard";
 import { CategoryFilter } from "@/components/CategoryFilter";
 import { AddProfileForm } from "@/components/AddProfileForm";
 import { ThemeToggle } from "@/components/ThemeToggle";
+import { Analytics } from "@/components/Analytics";
 import { AuthProvider, useAuth } from "@/context/AuthContext";
 import { getProfiles, getUserProfiles } from "@/lib/firestore";
 import { Profile } from "@/types";
-import { Search, Info } from "lucide-react";
+import { Search, Info, BarChart3, Menu, X } from "lucide-react";
 
 function HomeContent() {
   const [profiles, setProfiles] = useState<Profile[]>([]);
@@ -19,6 +20,8 @@ function HomeContent() {
   const [selectedCategory, setSelectedCategory] = useState("All");
   const [searchQuery, setSearchQuery] = useState("");
   const [showAddForm, setShowAddForm] = useState(false);
+  const [showAnalytics, setShowAnalytics] = useState(false);
+  const [mobileMenuOpen, setMobileMenuOpen] = useState(false);
   const [loading, setLoading] = useState(true);
   const { user, signIn, signOut } = useAuth();
 
@@ -88,6 +91,11 @@ function HomeContent() {
     setShowAddForm(true);
   };
 
+  const handleAnalytics = () => {
+    setShowAnalytics(true);
+    setMobileMenuOpen(false);
+  };
+
   return (
     <div className="min-h-screen bg-background">
       {/* Header */}
@@ -95,7 +103,9 @@ function HomeContent() {
         <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
           <div className="flex justify-between items-center h-16">
             <h1 className="text-xl sm:text-2xl font-bold text-foreground">XList</h1>
-            <div className="flex items-center space-x-2 sm:space-x-4">
+            
+            {/* Desktop Navigation */}
+            <div className="hidden sm:flex items-center space-x-2 sm:space-x-4">
               <ThemeToggle />
               <div className="relative group">
                 <a
@@ -112,6 +122,17 @@ function HomeContent() {
               </div>
               {user ? (
                 <>
+                  {userProfile && (
+                    <Button
+                      onClick={handleAnalytics}
+                      size="sm"
+                      variant="outline"
+                      className="text-xs sm:text-sm"
+                    >
+                      <BarChart3 className="w-4 h-4 mr-1" />
+                      Analytics
+                    </Button>
+                  )}
                   <Button
                     onClick={handleManageProfile}
                     size="sm"
@@ -120,7 +141,7 @@ function HomeContent() {
                     {userProfile ? "Manage Profile" : "Add Profile"}
                   </Button>
                   <div className="flex items-center space-x-2">
-                    <span className="text-xs sm:text-sm text-muted-foreground hidden sm:inline">
+                    <span className="text-xs sm:text-sm text-muted-foreground">
                       {user.displayName}
                     </span>
                     <Button
@@ -143,7 +164,103 @@ function HomeContent() {
                 </Button>
               )}
             </div>
+
+            {/* Mobile Navigation */}
+            <div className="sm:hidden flex items-center space-x-2">
+              <ThemeToggle />
+              <div className="relative group">
+                <a
+                  href="https://x.com/shipmodeon"
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-muted-foreground hover:text-foreground transition-colors"
+                >
+                  <Info className="w-4 h-4" />
+                </a>
+                <div className="absolute right-0 top-full mt-2 px-2 py-1 bg-popover text-popover-foreground text-xs rounded-md shadow-md border opacity-0 group-hover:opacity-100 transition-opacity pointer-events-none whitespace-nowrap z-50">
+                  any queries?
+                </div>
+              </div>
+              <Button
+                variant="ghost"
+                size="sm"
+                onClick={() => setMobileMenuOpen(!mobileMenuOpen)}
+                className="p-2"
+              >
+                {mobileMenuOpen ? <X className="w-5 h-5" /> : <Menu className="w-5 h-5" />}
+              </Button>
+            </div>
           </div>
+
+          {/* Mobile Menu */}
+          {mobileMenuOpen && (
+            <div className="sm:hidden fixed inset-0 z-50">
+              {/* Backdrop */}
+              <div
+                className="absolute inset-0 bg-black/20 backdrop-blur-sm"
+                onClick={() => setMobileMenuOpen(false)}
+              />
+              
+              {/* Menu Panel */}
+              <div className="absolute right-4 top-16 h-auto max-h-[80vh] w-1/2 max-w-xs bg-card/80 backdrop-blur-md border shadow-xl rounded-lg">
+                <div className="p-4 space-y-2">
+                  {/* Close button */}
+                  <div className="flex justify-end pb-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() => setMobileMenuOpen(false)}
+                      className="p-2"
+                    >
+                      <X className="w-5 h-5" />
+                    </Button>
+                  </div>
+                  
+                  {user ? (
+                    <>
+                      <div className="text-sm text-muted-foreground pb-2 px-2">
+                        {user.displayName}
+                      </div>
+                      {userProfile && (
+                        <Button
+                          onClick={handleAnalytics}
+                          variant="outline"
+                          size="sm"
+                          className="w-full justify-start"
+                        >
+                          <BarChart3 className="w-4 h-4 mr-2" />
+                          Analytics
+                        </Button>
+                      )}
+                      <Button
+                        onClick={handleManageProfile}
+                        size="sm"
+                        className="w-full justify-start"
+                      >
+                        {userProfile ? "Manage Profile" : "Add Profile"}
+                      </Button>
+                      <Button
+                        variant="outline"
+                        onClick={signOut}
+                        size="sm"
+                        className="w-full justify-start"
+                      >
+                        Sign Out
+                      </Button>
+                    </>
+                  ) : (
+                    <Button
+                      onClick={signIn}
+                      size="sm"
+                      className="w-full justify-start"
+                    >
+                      Sign In
+                    </Button>
+                  )}
+                </div>
+              </div>
+            </div>
+          )}
         </div>
       </header>
 
@@ -192,6 +309,14 @@ function HomeContent() {
               existingProfile={userProfile || undefined}
             />
           </div>
+        )}
+
+        {/* Analytics Modal */}
+        {showAnalytics && userProfile && (
+          <Analytics
+            profileId={userProfile.id}
+            onClose={() => setShowAnalytics(false)}
+          />
         )}
 
         {/* Profiles Grid */}

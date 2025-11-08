@@ -2,15 +2,26 @@ import { Card, CardContent, CardHeader } from "@/components/ui/card";
 import { Badge } from "@/components/ui/badge";
 import { ExternalLink, MapPin, Globe, Users } from "lucide-react";
 import { Profile } from "@/types";
+import { trackProfileClick } from "@/lib/firestore";
 
 interface ProfileCardProps {
   profile: Profile;
 }
 
 export function ProfileCard({ profile }: ProfileCardProps) {
-  const openXProfile = () => {
-    const cleanHandle = profile.xHandle.replace("@", "").replace("https://x.com/", "");
-    window.open(`https://x.com/${cleanHandle}`, "_blank");
+  const openXProfile = async () => {
+    try {
+      // Track the click before opening the profile
+      await trackProfileClick(profile.id, navigator.userAgent);
+      
+      const cleanHandle = profile.xHandle.replace("@", "").replace("https://x.com/", "");
+      window.open(`https://x.com/${cleanHandle}`, "_blank");
+    } catch (error) {
+      console.error("Error tracking profile click:", error);
+      // Still open the profile even if tracking fails
+      const cleanHandle = profile.xHandle.replace("@", "").replace("https://x.com/", "");
+      window.open(`https://x.com/${cleanHandle}`, "_blank");
+    }
   };
 
   return (
